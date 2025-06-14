@@ -15,7 +15,7 @@ export class UserRepository implements IUserRepository {
     return this.repository.find();
   }
 
-  async findById(id: number): Promise<User | null> {
+  async findById(id: string): Promise<User | null> {
     return this.repository.findOneBy({ id });
   }
 
@@ -31,8 +31,8 @@ export class UserRepository implements IUserRepository {
     return this.repository.save(user);
   }
 
-  async delete(id: number): Promise<boolean> {
-    const result = await this.repository.delete(id);
+  async delete(id: string): Promise<boolean> {
+    const result = await this.repository.softDelete(id);
     const affectedRows = result.affected ?? 0;
     return affectedRows > 0;
   }

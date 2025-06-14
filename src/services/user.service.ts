@@ -18,7 +18,7 @@ export class UserService {
     return UserMapper.toResponseDtoArray(users);
   }
 
-  async findById(id: number): Promise<UserResponseDto | null> {
+  async findById(id: string): Promise<UserResponseDto | null> {
     const user = await this.userRepository.findById(id);
     return user ? UserMapper.toResponseDto(user) : null;
   }
@@ -43,7 +43,7 @@ export class UserService {
   }
 
   async update(
-    id: number,
+    id: string,
     updateUserDto: UpdateUserDto
   ): Promise<UserResponseDto | null> {
     const existingUser = await this.userRepository.findById(id);
@@ -69,7 +69,7 @@ export class UserService {
     return UserMapper.toResponseDto(savedUser);
   }
 
-  async delete(id: number): Promise<boolean> {
+  async delete(id: string): Promise<boolean> {
     const user = await this.userRepository.findById(id);
     if (!user) {
       return false;

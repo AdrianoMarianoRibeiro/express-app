@@ -2,18 +2,18 @@ import { Request, Response } from "express";
 import { injectable } from "tsyringe";
 import {
   Controller,
+  Delete,
   Get,
   Post,
   Put,
-  Delete,
 } from "../decorators/controller.decorator";
-import { UserService } from "../services/user.service";
-import { CreateUserDto } from "../dto/user/create-user.dto";
-import { UpdateUserDto } from "../dto/user/update-user.dto";
 import {
   ApiResponseDto,
   PaginatedResponseDto,
 } from "../dto/common/api-response.dto";
+import { CreateUserDto } from "../dto/user/create-user.dto";
+import { UpdateUserDto } from "../dto/user/update-user.dto";
+import { UserService } from "../services/user.service";
 
 @Controller("/user")
 @injectable()
@@ -29,7 +29,8 @@ export class UserController {
       if (req.query.page || req.query.limit) {
         // Paginated response
         const result = await this.userService.findWithPagination(page, limit);
-        return new PaginatedResponseDto(
+        return PaginatedResponseDto.paginated(
+          res,
           result.users,
           result.total,
           result.page,
@@ -39,33 +40,39 @@ export class UserController {
       }
       // All users
       const users = await this.userService.findAll();
-      return new ApiResponseDto(users, "Users retrieved successfully");
+      return ApiResponseDto.success(res, users, "Users retrieved successfully");
     } catch (error) {
-      res.status(500);
-      return new ApiResponseDto(null, "Failed to retrieve users", false);
+      return ApiResponseDto.error(
+        res,
+        "Failed to retrieve users",
+        res.statusCode
+      );
     }
   }
 
   @Get("/:id")
   async findById(req: Request, res: Response) {
     try {
-      const id = parseInt(req.params.id);
-      if (isNaN(id)) {
+      const id = req.params.id;
+      if (!id) {
         res.status(400);
-        return new ApiResponseDto(null, "Invalid user ID", false);
+        return ApiResponseDto.error(res, "Invalid user ID");
       }
 
       const user = await this.userService.findById(id);
 
       if (!user) {
         res.status(404);
-        return new ApiResponseDto(null, "User not found", false);
+        return ApiResponseDto.warning(res, "User not found");
       }
 
-      return new ApiResponseDto(user, "User retrieved successfully");
+      return ApiResponseDto.success(res, user, "User retrieved successfully");
     } catch (error) {
-      res.status(500);
-      return new ApiResponseDto(null, "Failed to retrieve user", false);
+      return ApiResponseDto.error(
+        res,
+        "Failed to retrieve user",
+        res.statusCode
+      );
     }
   }
 
@@ -75,23 +82,27 @@ export class UserController {
       const createUserDto: CreateUserDto = req.body;
 
       const user = await this.userService.create(createUserDto);
-      res.status(201);
-      return new ApiResponseDto(user, "User created successfully");
+
+      return ApiResponseDto.success(
+        res,
+        user,
+        "User created successfully",
+        res.statusCode
+      );
     } catch (error) {
       const message =
         error instanceof Error ? error.message : "Failed to create user";
-      res.status(400);
-      return new ApiResponseDto(null, message, false);
+      return ApiResponseDto.error(res, message, res.statusCode);
     }
   }
 
   @Put("/:id")
   async update(req: Request, res: Response) {
     try {
-      const id = parseInt(req.params.id);
-      if (isNaN(id)) {
+      const id = req.params.id;
+      if (!id) {
         res.status(400);
-        return new ApiResponseDto(null, "Invalid user ID", false);
+        return ApiResponseDto.warning(res, "Invalid user ID", res.statusCode);
       }
 
       const updateUserDto: UpdateUserDto = req.body;
@@ -100,38 +111,43 @@ export class UserController {
 
       if (!user) {
         res.status(404);
-        return new ApiResponseDto(null, "User not found", false);
+        return ApiResponseDto.warning(res, "User not found", res.statusCode);
       }
 
-      return new ApiResponseDto(user, "User updated successfully");
+      return ApiResponseDto.success(
+        res,
+        user,
+        "User updated successfully",
+        res.statusCode
+      );
     } catch (error) {
       const message =
         error instanceof Error ? error.message : "Failed to update user";
       res.status(400);
-      return new ApiResponseDto(null, message, false);
+      return ApiResponseDto.error(res, message, res.statusCode);
     }
   }
 
   @Delete("/:id")
   async remove(req: Request, res: Response) {
     try {
-      const id = parseInt(req.params.id);
-      if (isNaN(id)) {
+      const id = req.params.id;
+      if (!id) {
         res.status(400);
-        return new ApiResponseDto(null, "Invalid user ID", false);
+        return ApiResponseDto.warning(res, "Invalid user ID", res.statusCode);
       }
 
       const deleted = await this.userService.delete(id);
 
       if (!deleted) {
         res.status(404);
-        return new ApiResponseDto(null, "User not found", false);
+        return ApiResponseDto.warning(res, "User not found", res.statusCode);
       }
 
-      return new ApiResponseDto(null, "User deleted successfully");
+      return ApiResponseDto.success(res, "User deleted successfully");
     } catch (error) {
       res.status(500);
-      return new ApiResponseDto(null, "Failed to delete user", false);
+      return ApiResponseDto.error(res, "Failed to delete user", res.statusCode);
     }
   }
 }

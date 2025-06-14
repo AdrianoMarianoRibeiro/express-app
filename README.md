@@ -91,7 +91,7 @@ npm run start:prod
 @Entity('products')
 export class Product {
   @PrimaryGeneratedColumn()
-  id: number;
+  id: string;
 
   @Column()
   name: string;
