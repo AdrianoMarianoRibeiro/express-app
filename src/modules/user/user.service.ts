@@ -1,31 +1,22 @@
-import { inject, injectable } from "tsyringe";
-import { CreateUserDto } from "../dto/user/create-user.dto";
-import { UpdateUserDto } from "../dto/user/update-user.dto";
-import { UserResponseDto } from "../dto/user/user-response.dto";
-import { UserMapper } from "../mappers/user.mapper";
-import { IUserRepository } from "../repositories/interfaces/user-repository.interface";
-import { UserRepository } from "../repositories/user.repository";
+import { injectable, inject } from "tsyringe";
+import { UserRepository } from "./user.repository";
 
 @injectable()
 export class UserService {
-  constructor(
-    @inject(UserRepository) private userRepository: IUserRepository,
-    private userMapper: UserMapper
-  ) {}
+  constructor(@inject(UserRepository) private repository: UserRepository) {}
 
-  async findAll(): Promise<UserResponseDto[]> {
-    const users = await this.userRepository.findAll();
-    return UserMapper.toResponseDtoArray(users);
+  findAll(): Promise<any[]> {
+    return this.repository.findAll();
   }
 
-  async findById(id: string): Promise<UserResponseDto | null> {
+  async findById(id: number): Promise<UserResponseDto | null> {
     const user = await this.userRepository.findById(id);
-    return user ? UserMapper.toResponseDto(user) : null;
+    return user ? this.userMapper.toResponseDto(user) : null;
   }
 
   async findByEmail(email: string): Promise<UserResponseDto | null> {
     const user = await this.userRepository.findByEmail(email);
-    return user ? UserMapper.toResponseDto(user) : null;
+    return user ? this.userMapper.toResponseDto(user) : null;
   }
 
   async create(createUserDto: CreateUserDto): Promise<UserResponseDto> {
@@ -37,13 +28,13 @@ export class UserService {
       throw new Error("User with this email already exists");
     }
 
-    const userEntity = UserMapper.toEntity(createUserDto);
+    const userEntity = this.userMapper.toEntity(createUserDto);
     const createdUser = await this.userRepository.create(userEntity);
-    return UserMapper.toResponseDto(createdUser);
+    return this.userMapper.toResponseDto(createdUser);
   }
 
   async update(
-    id: string,
+    id: number,
     updateUserDto: UpdateUserDto
   ): Promise<UserResponseDto | null> {
     const existingUser = await this.userRepository.findById(id);
@@ -61,15 +52,15 @@ export class UserService {
       }
     }
 
-    const updatedUserEntity = UserMapper.updateEntityFromDto(
+    const updatedUserEntity = this.userMapper.updateEntityFromDto(
       existingUser,
       updateUserDto
     );
     const savedUser = await this.userRepository.update(updatedUserEntity);
-    return UserMapper.toResponseDto(savedUser);
+    return this.userMapper.toResponseDto(savedUser);
   }
 
-  async delete(id: string): Promise<boolean> {
+  async delete(id: number): Promise<boolean> {
     const user = await this.userRepository.findById(id);
     if (!user) {
       return false;
@@ -93,7 +84,7 @@ export class UserService {
     );
 
     return {
-      users: UserMapper.toResponseDtoArray(users),
+      users: this.userMapper.toResponseDtoArray(users),
       total,
       page,
       limit,

@@ -10,6 +10,7 @@ import {
   RouteDefinition,
 } from "../decorators/controller.decorator";
 import { MODULE_KEY, ModuleOptions } from "../decorators/module.decorator";
+import { HttpResponseInterceptor } from "./http/response.interceptor";
 
 export class ExpressApplication {
   private app: Express;
@@ -25,6 +26,7 @@ export class ExpressApplication {
     this.app.use(morgan("combined"));
     this.app.use(express.json());
     this.app.use(express.urlencoded({ extended: true }));
+    this.app.use(HttpResponseInterceptor.intercept());
   }
 
   async bootstrap(AppModule: any, dataSource?: DataSource): Promise<void> {
@@ -81,7 +83,7 @@ export class ExpressApplication {
     const routes: RouteDefinition[] =
       Reflect.getMetadata(ROUTES_KEY, ControllerClass) || [];
 
-    const controllerInstance = container.resolve(ControllerClass);
+    const controllerInstance = container.resolve(ControllerClass) as any;
 
     routes.forEach((route) => {
       const fullPath = `${controllerPrefix}${route.path}`;

@@ -1,5 +1,4 @@
 import { DataSource } from "typeorm";
-import { User } from "../entities/user.entity";
 
 const AppDataSource = new DataSource({
   type: "mysql",
@@ -10,7 +9,7 @@ const AppDataSource = new DataSource({
   database: process.env.DB_DATABASE || "express_app_mysql",
   synchronize: process.env.NODE_ENV === "development",
   logging: process.env.NODE_ENV === "development",
-  entities: [User],
+  entities: ["src/**/*.entity.{ts,js}"],
   migrations: ["src/database/migrations/**/*.ts"],
   subscribers: ["src/subscribers/**/*.ts"],
 });
