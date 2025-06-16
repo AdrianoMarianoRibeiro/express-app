@@ -1,8 +1,13 @@
 import { inject, injectable } from 'tsyringe';
+import { AppException } from '../../shared/exceptions';
+import { PageOptionsDto } from '../../shared/pagination/page-options.dto';
+import { PageDto } from '../../shared/pagination/page.dto';
+import { GetAllOptions } from '../../shared/repositories';
 import { BcryptService } from '../bcrypt/bcrypt.service';
 import { CreateUserDto, UpdateUserDto } from './dtos';
 import { IUserResponse } from './interfaces';
 import { UserMapper } from './mappers';
+import { UserEntity } from './user.entity';
 import { UserRepository } from './user.repository';
 
 @injectable()
@@ -12,8 +17,11 @@ export class UserService {
     private readonly bcryptService: BcryptService,
   ) {}
 
-  findAll(): Promise<any[]> {
-    return this.repository.findAll();
+  findAll(
+    pageOptionsDto: PageOptionsDto,
+    options: GetAllOptions<UserEntity>,
+  ): Promise<PageDto<IUserResponse>> {
+    return this.repository.getAll(pageOptionsDto, options);
   }
 
   async find(id: string): Promise<IUserResponse | null> {
@@ -31,7 +39,9 @@ export class UserService {
       email: createUserDto.email,
     });
     if (existingUser) {
-      throw new Error('User with this email already exists');
+      throw new AppException({
+        email: 'Email already in use by another user',
+      });
     }
 
     createUserDto.password = await this.bcryptService.encrypt(
@@ -58,7 +68,9 @@ export class UserService {
         email: updateUserDto.email,
       });
       if (userWithEmail && userWithEmail.id !== id) {
-        throw new Error('Email already in use by another user');
+        throw new AppException({
+          email: 'Email already in use by another user',
+        });
       }
     }
 

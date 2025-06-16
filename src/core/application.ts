@@ -15,6 +15,7 @@ import { MODULE_KEY, ModuleOptions } from '../decorators/module.decorator';
 import { SwaggerGenerator } from '../shared/common/swagger/swagger.generator';
 import { AppExceptionFilter } from '../shared/filters/http-exception/app-http-exception.filter';
 import { HttpResponseInterceptor } from './http/response.interceptor';
+import { AppException } from '../shared/exceptions';
 
 export class ExpressApplication {
   private app: Express;
@@ -91,7 +92,7 @@ export class ExpressApplication {
     );
 
     if (!moduleMetadata) {
-      throw new Error(`${ModuleClass.name} is not a valid module`);
+      throw new AppException(`${ModuleClass.name} is not a valid module`);
     }
 
     // Load imported modules first

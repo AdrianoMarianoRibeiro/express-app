@@ -4,12 +4,12 @@ export class AppException extends Error {
   public readonly statusCode: number;
   public readonly message: string;
   public readonly title: string;
-  public readonly data?: string;
+  public readonly data?: any;
 
   constructor(
-    data: string,
-    message: string = 'Atenção',
+    data: any,
     statusCode: number = HttpStatusCode.BadRequest,
+    message: string = 'Atenção',
   ) {
     super(message);
     this.message = message;
@@ -17,7 +17,6 @@ export class AppException extends Error {
     this.data = data;
     this.name = this.constructor.name;
 
-    // Maintains proper stack trace for where our error was thrown
     Error.captureStackTrace(this, this.constructor);
   }
 

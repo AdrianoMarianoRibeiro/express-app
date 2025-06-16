@@ -10,9 +10,13 @@ import {
   Query,
 } from '../../decorators';
 import { SwaggerModule } from '../../decorators/swagger-module.decorator';
+import { PageOptionsDto } from '../../shared/pagination/page-options.dto';
+import { PageDto } from '../../shared/pagination/page.dto';
+import { GetAllOptions } from '../../shared/repositories';
 import { CreateUserDto, UpdateUserDto } from './dtos';
 import { IUserResponse } from './interfaces';
 import { UserSwaggerConfig } from './swagger';
+import { UserEntity } from './user.entity';
 import { UserService } from './user.service';
 
 @injectable()
@@ -23,12 +27,20 @@ export class UserController {
 
   @Get()
   async findAll(
-    @Query('page') page?: string,
-    @Query('limit') limit?: string,
-  ): Promise<any> {
-    const pageNum = parseInt(page || '1');
-    const limitNum = parseInt(limit || '10');
-    return await this.service.findWithPagination(pageNum, limitNum);
+    @Query() pageOptionsDto: PageOptionsDto,
+    @Query('orderBy') orderByField?: string,
+    @Query('searchTerm') searchTerm?: string,
+  ): Promise<PageDto<IUserResponse>> {
+    const options: GetAllOptions<UserEntity> = {
+      orderByField: orderByField as keyof UserEntity,
+      searchTerm,
+      searchFields: ['name', 'email', 'status'],
+      filters: { status: true },
+      relations: [],
+      excludeFields: ['password'],
+    };
+
+    return this.service.findAll(pageOptionsDto, options);
   }
 
   @Post()
