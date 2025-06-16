@@ -1,6 +1,5 @@
 import { injectable } from 'tsyringe';
 import {
-  ApiTags,
   Body,
   Controller,
   Delete,
@@ -10,13 +9,15 @@ import {
   Put,
   Query,
 } from '../../decorators';
+import { SwaggerModule } from '../../decorators/swagger-module.decorator';
 import { CreateUserDto, UpdateUserDto } from './dtos';
 import { IUserResponse } from './interfaces';
+import { UserSwaggerConfig } from './swagger';
 import { UserService } from './user.service';
 
 @injectable()
 @Controller('/user')
-@ApiTags('User')
+@SwaggerModule(UserSwaggerConfig)
 export class UserController {
   constructor(private readonly service: UserService) {}
 
