@@ -1,6 +1,6 @@
-import { Module } from "../decorators/module.decorator";
-import { AppController } from "../controllers/app.controller";
-import { UserModule } from "./user.module";
+import { AppController } from '../controllers/app.controller';
+import { Module } from '../decorators/module.decorator';
+import { UserModule } from './user/user.module';
 
 @Module({
   imports: [UserModule],

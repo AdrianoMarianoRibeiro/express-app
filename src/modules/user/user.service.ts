@@ -1,90 +1,110 @@
-import { injectable, inject } from "tsyringe";
-import { UserRepository } from "./user.repository";
+import { inject, injectable } from 'tsyringe';
+import { BcryptService } from '../bcrypt/bcrypt.service';
+import { CreateUserDto, UpdateUserDto } from './dtos';
+import { IUserResponse } from './interfaces';
+import { UserMapper } from './mappers';
+import { UserRepository } from './user.repository';
 
 @injectable()
 export class UserService {
-  constructor(@inject(UserRepository) private repository: UserRepository) {}
+  constructor(
+    @inject(UserRepository) private repository: UserRepository,
+    private readonly bcryptService: BcryptService,
+  ) {}
 
   findAll(): Promise<any[]> {
     return this.repository.findAll();
   }
 
-  async findById(id: number): Promise<UserResponseDto | null> {
-    const user = await this.userRepository.findById(id);
-    return user ? this.userMapper.toResponseDto(user) : null;
+  async find(id: string): Promise<IUserResponse | null> {
+    const user = await this.repository.find(id);
+    return user ? UserMapper.toResponse(user) : null;
   }
 
-  async findByEmail(email: string): Promise<UserResponseDto | null> {
-    const user = await this.userRepository.findByEmail(email);
-    return user ? this.userMapper.toResponseDto(user) : null;
+  async findByEmail(email: string): Promise<IUserResponse | null> {
+    const user = await this.repository.findOneWhere({ email });
+    return user ? UserMapper.toResponse(user) : null;
   }
 
-  async create(createUserDto: CreateUserDto): Promise<UserResponseDto> {
-    // Check if user already exists
-    const existingUser = await this.userRepository.findByEmail(
-      createUserDto.email
-    );
+  async create(createUserDto: CreateUserDto): Promise<IUserResponse> {
+    const existingUser = await this.repository.findOneWhere({
+      email: createUserDto.email,
+    });
     if (existingUser) {
-      throw new Error("User with this email already exists");
+      throw new Error('User with this email already exists');
     }
 
-    const userEntity = this.userMapper.toEntity(createUserDto);
-    const createdUser = await this.userRepository.create(userEntity);
-    return this.userMapper.toResponseDto(createdUser);
+    createUserDto.password = await this.bcryptService.encrypt(
+      createUserDto.password,
+    );
+
+    const userEntity = UserMapper.toEntity(createUserDto);
+    const createdUser = await this.repository.create(userEntity);
+    return UserMapper.toResponse(createdUser);
   }
 
   async update(
-    id: number,
-    updateUserDto: UpdateUserDto
-  ): Promise<UserResponseDto | null> {
-    const existingUser = await this.userRepository.findById(id);
+    id: string,
+    updateUserDto: UpdateUserDto,
+  ): Promise<IUserResponse | null> {
+    const existingUser = await this.repository.find(id);
     if (!existingUser) {
       return null;
     }
 
     // Check email uniqueness if email is being updated
     if (updateUserDto.email && updateUserDto.email !== existingUser.email) {
-      const userWithEmail = await this.userRepository.findByEmail(
-        updateUserDto.email
-      );
+      const userWithEmail = await this.repository.findOneWhere({
+        email: updateUserDto.email,
+      });
       if (userWithEmail && userWithEmail.id !== id) {
-        throw new Error("Email already in use by another user");
+        throw new Error('Email already in use by another user');
       }
     }
 
-    const updatedUserEntity = this.userMapper.updateEntityFromDto(
+    const updatedUserEntity = UserMapper.updateEntityFromDto(
       existingUser,
-      updateUserDto
+      updateUserDto,
     );
-    const savedUser = await this.userRepository.update(updatedUserEntity);
-    return this.userMapper.toResponseDto(savedUser);
+    const savedUser = await this.repository.update(updatedUserEntity);
+    return UserMapper.toResponse(savedUser);
   }
 
-  async delete(id: number): Promise<boolean> {
-    const user = await this.userRepository.findById(id);
+  async delete(id: string): Promise<boolean> {
+    const user = await this.repository.find(id);
     if (!user) {
       return false;
     }
-    return this.userRepository.delete(id);
+    const result = await this.repository.delete(id);
+    return result.affected > 0;
+  }
+
+  async softDelete(id: string): Promise<boolean> {
+    const user = await this.repository.find(id);
+    if (!user) {
+      return false;
+    }
+    const result = await this.repository.softDelete(id);
+    return result.affected > 0;
   }
 
   async findWithPagination(
     page: number = 1,
-    limit: number = 10
+    limit: number = 10,
   ): Promise<{
-    users: UserResponseDto[];
+    users: IUserResponse[];
     total: number;
     page: number;
     limit: number;
     totalPages: number;
   }> {
-    const [users, total] = await this.userRepository.findWithPagination(
+    const [users, total] = await this.repository.findWithPagination(
       page,
-      limit
+      limit,
     );
 
     return {
-      users: this.userMapper.toResponseDtoArray(users),
+      users: UserMapper.toResponseArray(users),
       total,
       page,
       limit,
