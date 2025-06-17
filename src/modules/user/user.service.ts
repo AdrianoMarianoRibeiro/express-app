@@ -29,6 +29,10 @@ export class UserService {
     return user ? UserMapper.toResponse(user) : null;
   }
 
+  async findById(id: string): Promise<UserEntity | null> {
+    return await this.repository.find(id);
+  }
+
   async findByEmail(email: string): Promise<IUserResponse | null> {
     const user = await this.repository.findOneWhere({ email });
     return user ? UserMapper.toResponse(user) : null;

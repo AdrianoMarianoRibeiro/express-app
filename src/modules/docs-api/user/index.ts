@@ -1,5 +1,5 @@
 import { SwaggerModuleConfig } from '../../../decorators/swagger-module.decorator';
-import { CreateUserDto, UpdateUserDto, UserResponseDto } from '../dtos';
+import { CreateUserDto, UpdateUserDto, UserResponseDto } from '../../user/dtos';
 
 export const UserSwaggerConfig: SwaggerModuleConfig = {
   tag: 'Users',

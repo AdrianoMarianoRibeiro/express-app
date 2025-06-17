@@ -13,38 +13,41 @@ import { SwaggerModule } from '../../decorators/swagger-module.decorator';
 import { PageOptionsDto } from '../../shared/pagination/page-options.dto';
 import { PageDto } from '../../shared/pagination/page.dto';
 import { GetAllOptions } from '../../shared/repositories';
-import { UserSwaggerConfig } from '../docs-api/user';
-import { CreateUserDto, UpdateUserDto } from './dtos';
-import { IUserResponse } from './interfaces';
-import { UserEntity } from './user.entity';
-import { UserService } from './user.service';
+import { PostSwaggerConfig } from '../docs-api/post';
+import { CreatePostDto, PostResponseDto } from './dtos';
+import { PostEntity } from './post.entity';
+import { PostService } from './post.service';
 
 @injectable()
-@Controller('/user')
-@SwaggerModule(UserSwaggerConfig)
-export class UserController {
-  constructor(private readonly service: UserService) {}
+@Controller('/post')
+@SwaggerModule(PostSwaggerConfig)
+export class PostController {
+  constructor(private readonly service: PostService) {}
 
   @Get()
   async findAll(
     @Query() pageOptionsDto: PageOptionsDto,
     @Query('orderBy') orderByField?: string,
     @Query('searchTerm') searchTerm?: string,
-  ): Promise<PageDto<IUserResponse>> {
-    const options: GetAllOptions<UserEntity> = {
-      orderByField: orderByField as keyof UserEntity,
+  ): Promise<PageDto<PostEntity>> {
+    const options: GetAllOptions<PostEntity> = {
+      orderByField: orderByField as keyof PostEntity,
       searchTerm,
-      searchFields: ['name', 'email', 'status'],
-      filters: { status: true },
-      relations: [],
-      excludeFields: ['password'],
+      searchFields: ['post', 'userEntity'],
+      filters: {},
+      relations: ['userEntity'],
+      excludeFields: [],
+      relationSelects: {},
+      excludeRelationFields: {
+        userEntity: ['password'], // Excluir password do userEntity
+      },
     };
 
     return this.service.findAll(pageOptionsDto, options);
   }
 
   @Post()
-  create(@Body() createUserDto: CreateUserDto): Promise<IUserResponse> {
+  create(@Body() createUserDto: CreatePostDto): Promise<PostResponseDto> {
     return this.service.create(createUserDto);
   }
 
@@ -54,7 +57,7 @@ export class UserController {
   }
 
   @Put(':id')
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
+  update(@Param('id') id: string, @Body() updateUserDto: PostResponseDto) {
     return this.service.update(id, updateUserDto);
   }
 

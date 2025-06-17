@@ -1,4 +1,4 @@
-import { UUIDUtil } from '../../../shared/utils/helpers';
+import { DateUtil, UUIDUtil } from '../../../shared/utils/helpers';
 import { CreateUserDto, UpdateUserDto } from '../dtos';
 import { IUserResponse } from '../interfaces';
 import { UserEntity } from '../user.entity';
@@ -42,6 +42,9 @@ export abstract class UserMapper {
     if (updateUserDto.status !== undefined) {
       user.status = updateUserDto.status;
     }
+
+    user.updatedAt = DateUtil.now();
+
     return user;
   }
 }

@@ -13,6 +13,8 @@ export interface GetAllOptions<T> {
   searchTerm?: string;
   searchFields?: Array<keyof T>;
   excludeFields?: Array<keyof T>;
+  relationSelects?: Record<string, string[]>;
+  excludeRelationFields?: Record<string, string[]>;
 }
 
 export abstract class AppBaseRepository<T extends Record<string, any>> {
@@ -77,6 +79,8 @@ export abstract class AppBaseRepository<T extends Record<string, any>> {
       searchTerm,
       searchFields = [],
       excludeFields = [],
+      relationSelects = {},
+      excludeRelationFields = {},
     } = options;
 
     pageOptionsDto.page = parseInt(pageOptionsDto.page.toString()) || 1;
@@ -100,7 +104,29 @@ export abstract class AppBaseRepository<T extends Record<string, any>> {
     }
 
     relations.forEach((relation) => {
-      queryBuilder.leftJoinAndSelect(`${alias}.${relation}`, relation);
+      queryBuilder.leftJoin(`${alias}.${relation}`, relation);
+
+      if (excludeRelationFields[relation]) {
+        // Se há campos para excluir nesta relação
+        const relationMetadata = this.repository.manager.connection.getMetadata(
+          this.getRelationEntityType(relation),
+        );
+
+        const allRelationColumns = relationMetadata.columns.map(
+          (col) => col.propertyName,
+        );
+        const selectedRelationColumns = allRelationColumns.filter(
+          (col) => !excludeRelationFields[relation].includes(col),
+        );
+
+        // Adicionar apenas os campos não excluídos
+        queryBuilder.addSelect(
+          selectedRelationColumns.map((col) => `${relation}.${col}`),
+        );
+      } else {
+        // Se não há exclusões, selecionar todos os campos da relação
+        queryBuilder.addSelect(`${relation}`);
+      }
     });
 
     this.applyFilters(queryBuilder, filters, alias);
@@ -123,6 +149,14 @@ export abstract class AppBaseRepository<T extends Record<string, any>> {
     const pageMetaDto = new PageMetaDto({ itemCount, pageOptionsDto });
 
     return new PageDto(entities, pageMetaDto);
+  }
+
+  private getRelationEntityType(relationName: string): any {
+    const metadata = this.repository.metadata;
+    const relation = metadata.relations.find(
+      (rel) => rel.propertyName === relationName,
+    );
+    return relation?.type;
   }
 
   // Método auxiliar para aplicar filtros
