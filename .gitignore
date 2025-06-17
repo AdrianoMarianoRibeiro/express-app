@@ -4,8 +4,7 @@
 package-lock.json
 .env
 .env.local
-.env.docker
-docker/observability/position
+.env
 data/
 static/files
 docker-compose.yml
