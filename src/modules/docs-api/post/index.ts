@@ -1,4 +1,5 @@
 import { SwaggerModuleConfig } from '../../../decorators/swagger-module.decorator';
+import { PaginationResponseDto } from '../../../shared/libs/pagination';
 import { CreatePostDto, PostResponseDto, UpdatePostDto } from '../../post/dtos';
 
 export const PostSwaggerConfig: SwaggerModuleConfig = {
@@ -20,20 +21,31 @@ export const PostSwaggerConfig: SwaggerModuleConfig = {
           type: 'number',
           required: false,
         },
+        {
+          name: 'orderBy',
+          description: 'Field to order by',
+          type: 'string',
+          required: false,
+        },
+        {
+          name: 'searchTerm',
+          description: 'Search term',
+          type: 'string',
+          required: false,
+        },
       ],
       responses: [
         {
           status: 200,
           description: 'Posts retrieved successfully',
-          type: PostResponseDto,
-          isArray: true,
+          type: PaginationResponseDto, // Use o DTO paginado
         },
         { status: 400, description: 'Invalid pagination parameters' },
       ],
     },
     create: {
       summary: 'Create Post',
-      description: 'Create a new Post account',
+      description: 'Create a new Post',
       body: { description: 'Post data', type: CreatePostDto, required: true },
       responses: [
         {
@@ -41,7 +53,6 @@ export const PostSwaggerConfig: SwaggerModuleConfig = {
           description: 'Post created successfully',
           type: PostResponseDto,
         },
-        { status: 409, description: 'Email already exists' },
         { status: 400, description: 'Invalid Post data' },
       ],
     },

@@ -32,10 +32,10 @@ export class CreatePostDto {
   post: string;
 
   @ApiProperty({
-    description: 'The user of the Post',
+    description: 'The ID user of the Post',
     type: 'string',
-    format: 'email',
-    example: 'john.doe@example.com',
+    format: 'string',
+    example: 'uuid-string',
   })
   @IsNotEmpty()
   userId: string;
@@ -65,14 +65,12 @@ export class UpdatePostDto {
   post?: string;
 
   @ApiProperty({
-    description: 'The user of the Post',
+    description: 'The ID user of the Post',
     type: 'string',
-    format: 'email',
-    example: 'john.updated@example.com',
-    required: false,
+    format: 'string',
+    example: 'uuid-string',
   })
   @IsOptional()
-  @IsEmail()
   userId?: string;
 
   @IsOptional()
@@ -81,49 +79,39 @@ export class UpdatePostDto {
 
 export class PostResponseDto {
   @ApiProperty({
-    description: 'The unique identifier of the Post',
-    type: 'string', // Corrigido para string para bater com sua interface
-    example: 'uuid-string',
+    description: 'Post ID',
+    type: 'string',
+    example: 'uuid-do-post',
   })
   id: string;
 
   @ApiProperty({
-    description: 'The name of the Post',
+    description: 'Post content',
     type: 'string',
-    example: 'John Doe',
+    example: 'Este é um post de exemplo',
   })
   post: string;
 
   @ApiProperty({
-    description: 'The user of the Post',
-    type: 'string',
-    format: 'email',
-    example: 'john.doe@example.com',
+    description: 'User who created the post',
+    type: () => UserResponseDto, // Referência ao DTO do usuário
+    required: false,
   })
-  user: UserResponseDto;
+  userEntity?: UserResponseDto;
 
   @ApiProperty({
-    description: 'When the Post was created',
+    description: 'Creation date',
     type: 'string',
     format: 'date-time',
-    example: '2023-12-01T10:00:00Z',
+    example: '2025-06-17T10:00:00.000Z',
   })
   createdAt: Date;
 
   @ApiProperty({
-    description: 'When the Post was last updated',
+    description: 'Update date',
     type: 'string',
     format: 'date-time',
-    example: '2023-12-01T10:00:00Z',
+    example: '2025-06-17T10:00:00.000Z',
   })
   updatedAt: Date;
-
-  @ApiProperty({
-    description: 'When the Post was deleted',
-    type: 'string',
-    format: 'date-time',
-    example: '2023-12-01T10:00:00Z',
-    required: false,
-  })
-  deletedAt?: Date;
 }
