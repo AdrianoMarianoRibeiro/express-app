@@ -4,29 +4,28 @@ import { AppException } from '../../exceptions';
 export class AppExceptionFilter {
   static catch() {
     return (error: Error, req: Request, res: Response, next: NextFunction) => {
+      // Verificar se a resposta já foi enviada
+      if (res.headersSent) {
+        return next(error);
+      }
+
+      // Marcar a resposta como sendo de erro para evitar interceptação
+      (res as any).__isErrorResponse = true;
+
       // Se for uma AppException, trata de forma específica
       if (error instanceof AppException) {
         const status = error.getStatus();
 
         return res.status(status).json({
           code: status,
-          error: {
-            title: error.title,
-            message: error.message,
-          },
-          data: error.data || null,
+          data: error.data || error.message || null,
         });
       }
 
-      // Para outros tipos de erro, trata de forma genérica
-      console.error('Unhandled error:', error);
-
+      // Erro genérico
       return res.status(500).json({
         code: 500,
-        error: {
-          title: 'Internal Server Error',
-          message: 'An unexpected error occurred',
-        },
+        data: 'Internal Server Error',
       });
     };
   }

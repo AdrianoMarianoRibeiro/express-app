@@ -14,9 +14,15 @@ export class HttpResponseInterceptor {
 
       // Override json method
       res.json = function <T>(data: T): Response {
+        // Verificar se é uma resposta de erro - NÃO interceptar
+        if ((this as any).__isErrorResponse) {
+          return originalJson.call(this, data);
+        }
+
+        // Interceptar apenas respostas de sucesso
         const responseDto: ResponseDto<T> = {
-          data,
           code: res.statusCode,
+          data,
         };
 
         return originalJson.call(this, responseDto);

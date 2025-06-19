@@ -5,7 +5,7 @@ import { PageOptionsDto } from '../../shared/pagination/page-options.dto';
 import { PageDto } from '../../shared/pagination/page.dto';
 import { GetAllOptions } from '../../shared/repositories';
 import { PostSwaggerConfig } from '../docs-api/post';
-import { CreatePostDto, PostResponseDto } from './dtos';
+import { CreatePostDto, PostResponseDto, UpdatePostDto } from './dtos';
 import { PostEntity } from './post.entity';
 import { PostService } from './post.service';
 
@@ -48,8 +48,8 @@ export class PostController {
   }
 
   @Put(':id')
-  update(@Param('id') id: string, @Body() updateUserDto: PostResponseDto) {
-    return this.service.update(id, updateUserDto);
+  update(@Param('id') id: string, @Body() updatePostDto: UpdatePostDto) {
+    return this.service.update(id, updatePostDto);
   }
 
   @Delete(':id')

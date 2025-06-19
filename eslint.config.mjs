@@ -55,7 +55,7 @@ export default [
       '@typescript-eslint/no-non-null-assertion': 'off',
 
       // General rules
-      'no-console': 'warn',
+      'no-console': 'off', // Desabilita o warning de console.log
       'no-debugger': 'error',
       'no-duplicate-imports': 'error',
       'no-unused-vars': 'off', // Use TypeScript version instead

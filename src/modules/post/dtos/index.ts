@@ -1,7 +1,7 @@
-import { IsBoolean, IsEmail, IsNotEmpty, IsOptional, IsString, MinLength } from 'class-validator';
+import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
 import { ApiProperty } from '../../../decorators';
-import { UserEntity } from '../../user/user.entity';
 import { UserResponseDto } from '../../user/dtos';
+import { UserEntity } from '../../user/user.entity';
 
 export class CreatePostDto {
   @ApiProperty({

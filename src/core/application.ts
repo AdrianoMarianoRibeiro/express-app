@@ -13,9 +13,9 @@ import {
 } from '../decorators/controller.decorator';
 import { MODULE_KEY, ModuleOptions } from '../decorators/module.decorator';
 import { SwaggerGenerator } from '../shared/common/swagger/swagger.generator';
-import { AppExceptionFilter } from '../shared/filters/http-exception/app-http-exception.filter';
-import { HttpResponseInterceptor } from './http/response.interceptor';
 import { AppException } from '../shared/exceptions';
+import { HttpResponseInterceptor } from './http/response.interceptor';
+import { AppExceptionFilter } from '../shared/filters/http-exception/app-http-exception.filter';
 
 export class ExpressApplication {
   private app: Express;
@@ -261,7 +261,7 @@ export class ExpressApplication {
     let normalized = path.replace(/\/+/g, '/');
 
     if (!normalized.startsWith('/')) {
-      normalized = '/' + normalized;
+      normalized = `/${normalized}`;
     }
 
     // Remove barra final se não for apenas '/'

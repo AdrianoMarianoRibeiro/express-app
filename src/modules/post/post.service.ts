@@ -1,3 +1,4 @@
+import { HttpStatusCode } from 'axios';
 import { inject, injectable } from 'tsyringe';
 import { AppException } from '../../shared/exceptions';
 import { PageOptionsDto } from '../../shared/pagination/page-options.dto';
@@ -48,7 +49,7 @@ export class PostService {
     const existingPost = await this.repository.find(id, ['userEntity']);
 
     if (!existingPost) {
-      return null;
+      throw new AppException('Post not found', HttpStatusCode.NotFound);
     }
 
     const updatedUserEntity = PostMapper.updateEntityFromDto(existingPost, updatePostDto);
@@ -60,7 +61,7 @@ export class PostService {
   async delete(id: string): Promise<boolean> {
     const user = await this.repository.find(id);
     if (!user) {
-      return false;
+      throw new AppException('Post not found', HttpStatusCode.NotFound);
     }
     const result = await this.repository.delete(id);
     return result.affected > 0;
@@ -69,7 +70,7 @@ export class PostService {
   async softDelete(id: string): Promise<boolean> {
     const user = await this.repository.find(id);
     if (!user) {
-      return false;
+      throw new AppException('Post not found', HttpStatusCode.NotFound);
     }
     const result = await this.repository.softDelete(id);
     return result.affected > 0;
