@@ -57,11 +57,7 @@ export function SwaggerModule(config: SwaggerModuleConfig) {
         ApiOperation({
           summary: endpointConfig.summary,
           description: endpointConfig.description,
-        })(
-          prototype,
-          methodName,
-          Object.getOwnPropertyDescriptor(prototype, methodName) || {},
-        );
+        })(prototype, methodName, Object.getOwnPropertyDescriptor(prototype, methodName) || {});
       }
 
       // Aplicar ApiResponse
@@ -72,11 +68,7 @@ export function SwaggerModule(config: SwaggerModuleConfig) {
             description: response.description,
             type: response.type,
             isArray: response.isArray,
-          })(
-            prototype,
-            methodName,
-            Object.getOwnPropertyDescriptor(prototype, methodName) || {},
-          );
+          })(prototype, methodName, Object.getOwnPropertyDescriptor(prototype, methodName) || {});
         });
       }
 
@@ -88,11 +80,7 @@ export function SwaggerModule(config: SwaggerModuleConfig) {
             description: param.description,
             type: param.type,
             required: param.required,
-          })(
-            prototype,
-            methodName,
-            Object.getOwnPropertyDescriptor(prototype, methodName) || {},
-          );
+          })(prototype, methodName, Object.getOwnPropertyDescriptor(prototype, methodName) || {});
         });
       }
 
@@ -104,11 +92,7 @@ export function SwaggerModule(config: SwaggerModuleConfig) {
             description: query.description,
             type: query.type,
             required: query.required,
-          })(
-            prototype,
-            methodName,
-            Object.getOwnPropertyDescriptor(prototype, methodName) || {},
-          );
+          })(prototype, methodName, Object.getOwnPropertyDescriptor(prototype, methodName) || {});
         });
       }
 
@@ -118,11 +102,7 @@ export function SwaggerModule(config: SwaggerModuleConfig) {
           description: endpointConfig.body.description,
           type: endpointConfig.body.type,
           required: endpointConfig.body.required,
-        })(
-          prototype,
-          methodName,
-          Object.getOwnPropertyDescriptor(prototype, methodName) || {},
-        );
+        })(prototype, methodName, Object.getOwnPropertyDescriptor(prototype, methodName) || {});
       }
     });
 

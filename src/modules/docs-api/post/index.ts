@@ -59,9 +59,7 @@ export const PostSwaggerConfig: SwaggerModuleConfig = {
     find: {
       summary: 'Get Post by ID',
       description: 'Retrieve a specific Post by their ID',
-      params: [
-        { name: 'id', description: 'Post ID', type: 'string', required: true },
-      ],
+      params: [{ name: 'id', description: 'Post ID', type: 'string', required: true }],
       responses: [
         { status: 200, description: 'Post found', type: PostResponseDto },
         { status: 404, description: 'Post not found' },
@@ -71,9 +69,7 @@ export const PostSwaggerConfig: SwaggerModuleConfig = {
     update: {
       summary: 'Update Post',
       description: 'Update an existing Post',
-      params: [
-        { name: 'id', description: 'Post ID', type: 'string', required: true },
-      ],
+      params: [{ name: 'id', description: 'Post ID', type: 'string', required: true }],
       body: {
         description: 'Updated Post data',
         type: UpdatePostDto,
@@ -93,9 +89,7 @@ export const PostSwaggerConfig: SwaggerModuleConfig = {
     delete: {
       summary: 'Delete Post',
       description: 'Delete a Post account',
-      params: [
-        { name: 'id', description: 'Post ID', type: 'string', required: true },
-      ],
+      params: [{ name: 'id', description: 'Post ID', type: 'string', required: true }],
       responses: [
         { status: 200, description: 'Post deleted successfully' },
         { status: 404, description: 'Post not found' },

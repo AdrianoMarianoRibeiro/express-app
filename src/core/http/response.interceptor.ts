@@ -1,11 +1,11 @@
-import { NextFunction, Request, Response } from "express";
-import { ResponseDto } from "./dtos/response.dto";
+import { NextFunction, Request, Response } from 'express';
+import { ResponseDto } from './dtos/response.dto';
 
 export class HttpResponseInterceptor {
   static intercept() {
     return (req: Request, res: Response, next: NextFunction) => {
       // Skip metrics endpoint
-      if (req.path.endsWith("/metrics")) {
+      if (req.path.endsWith('/metrics')) {
         return next();
       }
 

@@ -9,11 +9,7 @@ export interface ParamMetadata {
 }
 
 export function Param(key?: string) {
-  return function (
-    target: any,
-    propertyKey: string | symbol,
-    parameterIndex: number,
-  ) {
+  return function (target: any, propertyKey: string | symbol, parameterIndex: number) {
     const existingParams: ParamMetadata[] =
       Reflect.getMetadata(PARAMS_KEY, target, propertyKey) || [];
 
@@ -28,11 +24,7 @@ export function Param(key?: string) {
 }
 
 export function Query(key?: string) {
-  return function (
-    target: any,
-    propertyKey: string | symbol,
-    parameterIndex: number,
-  ) {
+  return function (target: any, propertyKey: string | symbol, parameterIndex: number) {
     const existingParams: ParamMetadata[] =
       Reflect.getMetadata(PARAMS_KEY, target, propertyKey) || [];
 
@@ -47,11 +39,7 @@ export function Query(key?: string) {
 }
 
 export function Body() {
-  return function (
-    target: any,
-    propertyKey: string | symbol,
-    parameterIndex: number,
-  ) {
+  return function (target: any, propertyKey: string | symbol, parameterIndex: number) {
     const existingParams: ParamMetadata[] =
       Reflect.getMetadata(PARAMS_KEY, target, propertyKey) || [];
 
@@ -65,11 +53,7 @@ export function Body() {
 }
 
 export function Headers(key?: string) {
-  return function (
-    target: any,
-    propertyKey: string | symbol,
-    parameterIndex: number,
-  ) {
+  return function (target: any, propertyKey: string | symbol, parameterIndex: number) {
     const existingParams: ParamMetadata[] =
       Reflect.getMetadata(PARAMS_KEY, target, propertyKey) || [];
 

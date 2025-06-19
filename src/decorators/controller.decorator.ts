@@ -24,10 +24,8 @@ export function extractParameters(
   req: Request,
   res: Response,
 ): any[] {
-  const paramsMetadata: ParamMetadata[] =
-    Reflect.getMetadata(PARAMS_KEY, target, methodName) || [];
-  const methodParams =
-    Reflect.getMetadata('design:paramtypes', target, methodName) || [];
+  const paramsMetadata: ParamMetadata[] = Reflect.getMetadata(PARAMS_KEY, target, methodName) || [];
+  const methodParams = Reflect.getMetadata('design:paramtypes', target, methodName) || [];
 
   const args = new Array(methodParams.length);
 
@@ -51,15 +49,9 @@ export function extractParameters(
   return args;
 }
 
-function createRouteDecorator(
-  method: 'get' | 'post' | 'put' | 'delete' | 'patch',
-) {
+function createRouteDecorator(method: 'get' | 'post' | 'put' | 'delete' | 'patch') {
   return function (path: string = '') {
-    return function (
-      target: any,
-      propertyKey: string,
-      descriptor: PropertyDescriptor,
-    ) {
+    return function (target: any, propertyKey: string, descriptor: PropertyDescriptor) {
       const existingRoutes: RouteDefinition[] =
         Reflect.getMetadata(ROUTES_KEY, target.constructor) || [];
 

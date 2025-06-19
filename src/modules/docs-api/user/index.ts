@@ -48,9 +48,7 @@ export const UserSwaggerConfig: SwaggerModuleConfig = {
     find: {
       summary: 'Get user by ID',
       description: 'Retrieve a specific user by their ID',
-      params: [
-        { name: 'id', description: 'User ID', type: 'string', required: true },
-      ],
+      params: [{ name: 'id', description: 'User ID', type: 'string', required: true }],
       responses: [
         { status: 200, description: 'User found', type: UserResponseDto },
         { status: 404, description: 'User not found' },
@@ -60,9 +58,7 @@ export const UserSwaggerConfig: SwaggerModuleConfig = {
     update: {
       summary: 'Update user',
       description: 'Update an existing user',
-      params: [
-        { name: 'id', description: 'User ID', type: 'string', required: true },
-      ],
+      params: [{ name: 'id', description: 'User ID', type: 'string', required: true }],
       body: {
         description: 'Updated user data',
         type: UpdateUserDto,
@@ -82,9 +78,7 @@ export const UserSwaggerConfig: SwaggerModuleConfig = {
     delete: {
       summary: 'Delete user',
       description: 'Delete a user account',
-      params: [
-        { name: 'id', description: 'User ID', type: 'string', required: true },
-      ],
+      params: [{ name: 'id', description: 'User ID', type: 'string', required: true }],
       responses: [
         { status: 200, description: 'User deleted successfully' },
         { status: 404, description: 'User not found' },

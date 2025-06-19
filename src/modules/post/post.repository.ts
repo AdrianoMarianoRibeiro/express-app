@@ -16,10 +16,7 @@ export class PostRepository extends AppBaseRepository<PostEntity> {
     return this.repository.count();
   }
 
-  async findWithPagination(
-    page: number,
-    limit: number,
-  ): Promise<[PostEntity[], number]> {
+  async findWithPagination(page: number, limit: number): Promise<[PostEntity[], number]> {
     return this.repository.findAndCount({
       skip: (page - 1) * limit,
       take: limit,

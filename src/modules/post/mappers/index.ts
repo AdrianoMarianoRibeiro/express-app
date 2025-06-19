@@ -32,10 +32,7 @@ export abstract class PostMapper {
     return users.map((user) => this.toResponse(user));
   }
 
-  static updateEntityFromDto(
-    postEntity: PostEntity,
-    updateUserDto: UpdatePostDto,
-  ): PostEntity {
+  static updateEntityFromDto(postEntity: PostEntity, updateUserDto: UpdatePostDto): PostEntity {
     if (updateUserDto.post !== undefined) {
       postEntity.post = updateUserDto.post;
     }

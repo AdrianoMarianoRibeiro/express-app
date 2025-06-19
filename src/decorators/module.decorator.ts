@@ -5,7 +5,7 @@ export interface ModuleOptions {
   exports?: any[];
 }
 
-export const MODULE_KEY = Symbol("module");
+export const MODULE_KEY = Symbol('module');
 
 export function Module(options: ModuleOptions) {
   return function (target: any) {

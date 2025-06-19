@@ -86,19 +86,14 @@ export abstract class AppBaseRepository<T extends Record<string, any>> {
     pageOptionsDto.page = parseInt(pageOptionsDto.page.toString()) || 1;
     pageOptionsDto.limit = parseInt(pageOptionsDto.limit.toString()) || 10;
     pageOptionsDto.order = pageOptionsDto.order || OrderEnum.ASC;
-    const skip =
-      pageOptionsDto.skip ?? (pageOptionsDto.page - 1) * pageOptionsDto.limit;
+    const skip = pageOptionsDto.skip ?? (pageOptionsDto.page - 1) * pageOptionsDto.limit;
 
     const queryBuilder = this.repository.createQueryBuilder(alias);
 
     // Seleciona apenas os campos desejados (excluindo os especificados)
     if (excludeFields.length > 0) {
-      const allColumns = this.repository.metadata.columns.map(
-        (col) => col.propertyName,
-      );
-      const selectedColumns = allColumns.filter(
-        (col) => !excludeFields.includes(col as keyof T),
-      );
+      const allColumns = this.repository.metadata.columns.map((col) => col.propertyName);
+      const selectedColumns = allColumns.filter((col) => !excludeFields.includes(col as keyof T));
 
       queryBuilder.select(selectedColumns.map((col) => `${alias}.${col}`));
     }
@@ -112,17 +107,13 @@ export abstract class AppBaseRepository<T extends Record<string, any>> {
           this.getRelationEntityType(relation),
         );
 
-        const allRelationColumns = relationMetadata.columns.map(
-          (col) => col.propertyName,
-        );
+        const allRelationColumns = relationMetadata.columns.map((col) => col.propertyName);
         const selectedRelationColumns = allRelationColumns.filter(
           (col) => !excludeRelationFields[relation].includes(col),
         );
 
         // Adicionar apenas os campos não excluídos
-        queryBuilder.addSelect(
-          selectedRelationColumns.map((col) => `${relation}.${col}`),
-        );
+        queryBuilder.addSelect(selectedRelationColumns.map((col) => `${relation}.${col}`));
       } else {
         // Se não há exclusões, selecionar todos os campos da relação
         queryBuilder.addSelect(`${relation}`);
@@ -135,10 +126,7 @@ export abstract class AppBaseRepository<T extends Record<string, any>> {
       this.applySearchTerm(queryBuilder, searchTerm, searchFields, alias);
     }
 
-    queryBuilder.orderBy(
-      `${alias}.${String(orderByField)}`,
-      pageOptionsDto.order,
-    );
+    queryBuilder.orderBy(`${alias}.${String(orderByField)}`, pageOptionsDto.order);
 
     // CORREÇÃO: Usar offset ao invés de skip
     queryBuilder.offset(skip).limit(pageOptionsDto.limit);
@@ -153,9 +141,7 @@ export abstract class AppBaseRepository<T extends Record<string, any>> {
 
   private getRelationEntityType(relationName: string): any {
     const metadata = this.repository.metadata;
-    const relation = metadata.relations.find(
-      (rel) => rel.propertyName === relationName,
-    );
+    const relation = metadata.relations.find((rel) => rel.propertyName === relationName);
     return relation?.type;
   }
 
@@ -189,9 +175,7 @@ export abstract class AppBaseRepository<T extends Record<string, any>> {
   ): void {
     if (searchFields.length === 0) return;
 
-    const conditions = searchFields.map(
-      (field) => `${alias}.${String(field)} LIKE :searchTerm`,
-    );
+    const conditions = searchFields.map((field) => `${alias}.${String(field)} LIKE :searchTerm`);
 
     queryBuilder.andWhere(`(${conditions.join(' OR ')})`, {
       searchTerm: `%${searchTerm}%`,

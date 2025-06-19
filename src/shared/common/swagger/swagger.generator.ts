@@ -22,10 +22,8 @@ export class SwaggerGenerator {
     };
 
     controllers.forEach((ControllerClass) => {
-      const controllerPrefix =
-        Reflect.getMetadata(CONTROLLER_KEY, ControllerClass) || '';
-      const routes: RouteDefinition[] =
-        Reflect.getMetadata(ROUTES_KEY, ControllerClass) || [];
+      const controllerPrefix = Reflect.getMetadata(CONTROLLER_KEY, ControllerClass) || '';
+      const routes: RouteDefinition[] = Reflect.getMetadata(ROUTES_KEY, ControllerClass) || [];
       const tags = Reflect.getMetadata(SWAGGER_API_TAGS, ControllerClass) || [
         ControllerClass.name.replace('Controller', ''),
       ];
@@ -41,11 +39,7 @@ export class SwaggerGenerator {
         }
 
         const controllerInstance = container.resolve(ControllerClass);
-        const operation = this.generateOperation(
-          controllerInstance,
-          route.methodName,
-          tags,
-        );
+        const operation = this.generateOperation(controllerInstance, route.methodName, tags);
 
         paths[fullPath][route.requestMethod] = operation;
       });
@@ -60,9 +54,7 @@ export class SwaggerGenerator {
       },
       servers: [
         {
-          url:
-            process.env.APP_URL ||
-            `http://localhost:${process.env.PORT || 3000}`,
+          url: process.env.APP_URL || `http://localhost:${process.env.PORT || 3000}`,
           description: 'Development server',
         },
       ],
@@ -73,20 +65,12 @@ export class SwaggerGenerator {
     return spec;
   }
 
-  private static generateOperation(
-    target: any,
-    methodName: string | symbol,
-    tags: string[],
-  ): any {
-    const operation =
-      Reflect.getMetadata(SWAGGER_API_OPERATION, target, methodName) || {};
-    const responses =
-      Reflect.getMetadata(SWAGGER_API_RESPONSE, target, methodName) || [];
-    const params =
-      Reflect.getMetadata(SWAGGER_API_PARAM, target, methodName) || [];
+  private static generateOperation(target: any, methodName: string | symbol, tags: string[]): any {
+    const operation = Reflect.getMetadata(SWAGGER_API_OPERATION, target, methodName) || {};
+    const responses = Reflect.getMetadata(SWAGGER_API_RESPONSE, target, methodName) || [];
+    const params = Reflect.getMetadata(SWAGGER_API_PARAM, target, methodName) || [];
     const body = Reflect.getMetadata(SWAGGER_API_BODY, target, methodName);
-    const queries =
-      Reflect.getMetadata(SWAGGER_API_QUERY, target, methodName) || [];
+    const queries = Reflect.getMetadata(SWAGGER_API_QUERY, target, methodName) || [];
 
     const swaggerOperation: any = {
       tags,
@@ -130,9 +114,7 @@ export class SwaggerGenerator {
         required: body.required !== false,
         content: {
           'application/json': {
-            schema: body.type
-              ? this.getSchemaRef(body.type.name)
-              : { type: 'object' },
+            schema: body.type ? this.getSchemaRef(body.type.name) : { type: 'object' },
           },
         },
       };
@@ -185,22 +167,13 @@ export class SwaggerGenerator {
     const dtoClasses = new Set<any>();
 
     controllers.forEach((ControllerClass) => {
-      const routes: RouteDefinition[] =
-        Reflect.getMetadata(ROUTES_KEY, ControllerClass) || [];
+      const routes: RouteDefinition[] = Reflect.getMetadata(ROUTES_KEY, ControllerClass) || [];
       const controllerInstance = container.resolve(ControllerClass) as any;
 
       routes.forEach((route) => {
-        const body = Reflect.getMetadata(
-          SWAGGER_API_BODY,
-          controllerInstance,
-          route.methodName,
-        );
+        const body = Reflect.getMetadata(SWAGGER_API_BODY, controllerInstance, route.methodName);
         const responses =
-          Reflect.getMetadata(
-            SWAGGER_API_RESPONSE,
-            controllerInstance,
-            route.methodName,
-          ) || [];
+          Reflect.getMetadata(SWAGGER_API_RESPONSE, controllerInstance, route.methodName) || [];
 
         if (body && body.type) {
           dtoClasses.add(body.type);
@@ -241,8 +214,7 @@ export class SwaggerGenerator {
   }
 
   private static generateSchemaFromClass(dtoClass: any): any {
-    const properties =
-      Reflect.getMetadata(SWAGGER_API_PROPERTY, dtoClass) || {};
+    const properties = Reflect.getMetadata(SWAGGER_API_PROPERTY, dtoClass) || {};
     const schema: any = {
       type: 'object',
       properties: {},

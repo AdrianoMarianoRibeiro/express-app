@@ -44,20 +44,14 @@ export class PostService {
     return PostMapper.toResponse(entity);
   }
 
-  async update(
-    id: string,
-    updatePostDto: UpdatePostDto,
-  ): Promise<PostResponseDto | null> {
+  async update(id: string, updatePostDto: UpdatePostDto): Promise<PostResponseDto | null> {
     const existingPost = await this.repository.find(id, ['userEntity']);
 
     if (!existingPost) {
       return null;
     }
 
-    const updatedUserEntity = PostMapper.updateEntityFromDto(
-      existingPost,
-      updatePostDto,
-    );
+    const updatedUserEntity = PostMapper.updateEntityFromDto(existingPost, updatePostDto);
 
     const savedUser = await this.repository.update(updatedUserEntity);
     return PostMapper.toResponse(savedUser);

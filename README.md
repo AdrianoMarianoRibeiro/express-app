@@ -5,6 +5,7 @@ Esta é uma API Express.js estruturada como NestJS, utilizando TSyringe para inj
 ## 🏗️ Arquitetura
 
 ### Camadas da Aplicação
+
 ```
 Controller → Service → Repository → Entity
      ↓         ↓         ↓         ↓
@@ -54,6 +55,17 @@ src/
 └── main.ts            # Bootstrap da aplicação
 ```
 
+## .prettierrc
+# Formatar todos os arquivos
+npx prettier --write .
+
+# Verificar formatação
+npx prettier --check .
+
+# Formatar arquivo específico
+npx prettier --write src/main.ts
+
+
 ## 🛠️ Instalação e Execução
 
 ```bash
@@ -71,10 +83,12 @@ npm run start:prod
 ## 📋 Rotas da API
 
 ### Aplicação
+
 - `GET /` - Informações da API
 - `GET /health` - Health check
 
 ### Usuários
+
 - `GET /users` - Listar usuários (com paginação opcional)
 - `GET /users?page=1&limit=10` - Listar com paginação
 - `GET /users/:id` - Buscar usuário por ID
@@ -114,7 +128,7 @@ export class ProductRepository implements IProductRepository {
 export class ProductService {
   constructor(
     @inject(ProductRepository) private productRepository: IProductRepository,
-    private productMapper: ProductMapper
+    private productMapper: ProductMapper,
   ) {}
   // ... lógica de negócio
 }
@@ -134,7 +148,7 @@ export class ProductController {
 // product.module.ts
 @Module({
   controllers: [ProductController],
-  providers: [ProductService, ProductRepository, ProductMapper]
+  providers: [ProductService, ProductRepository, ProductMapper],
 })
 export class ProductModule {}
 ```
@@ -142,6 +156,7 @@ export class ProductModule {}
 ## 📊 Exemplos de Resposta
 
 ### Sucesso
+
 ```json
 {
   "data": {

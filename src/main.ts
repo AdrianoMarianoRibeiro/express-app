@@ -22,12 +22,8 @@ async function bootstrap() {
     app.listen(port);
 
     console.log(`🚀 Application is running on: http://localhost:${port}`);
-    console.log(
-      `📚 Swagger docs available at: http://localhost:${port}/api-docs`,
-    );
-    console.log(
-      `⏰ Server timezone: ${Intl.DateTimeFormat().resolvedOptions().timeZone}`,
-    );
+    console.log(`📚 Swagger docs available at: http://localhost:${port}/api-docs`);
+    console.log(`⏰ Server timezone: ${Intl.DateTimeFormat().resolvedOptions().timeZone}`);
     console.log(
       `🕐 Current time: ${new Date().toLocaleString('pt-BR', {
         timeZone: 'America/Sao_Paulo',

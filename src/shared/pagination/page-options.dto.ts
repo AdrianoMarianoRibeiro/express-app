@@ -24,13 +24,9 @@ export class PageOptionsDto {
 
   get skip(): number {
     const pageNum =
-      typeof this.page === 'number'
-        ? this.page
-        : parseInt(String(this.page), 10) || 1;
+      typeof this.page === 'number' ? this.page : parseInt(String(this.page), 10) || 1;
     const limitNum =
-      typeof this.limit === 'number'
-        ? this.limit
-        : parseInt(String(this.limit), 10) || 10;
+      typeof this.limit === 'number' ? this.limit : parseInt(String(this.limit), 10) || 10;
 
     console.log('Skip calculation:', {
       page: pageNum,

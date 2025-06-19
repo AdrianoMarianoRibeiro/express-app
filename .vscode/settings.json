@@ -1,5 +1,11 @@
 {
-    "cSpell.words": [
-        "tsyringe"
-    ]
+  "cSpell.words": ["tsyringe"],
+  "editor.formatOnSave": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit",
+    "source.organizeImports": "explicit"
+  },
+  "eslint.validate": ["typescript"],
+  "typescript.preferences.organizeImportsOnSave": true
 }

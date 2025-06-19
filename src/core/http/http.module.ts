@@ -1,5 +1,5 @@
-import { Module } from "../../decorators/module.decorator";
-import { HttpService } from "./http.service";
+import { Module } from '../../decorators/module.decorator';
+import { HttpService } from './http.service';
 
 @Module({
   providers: [HttpService],

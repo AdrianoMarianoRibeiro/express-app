@@ -1,14 +1,5 @@
 import { injectable } from 'tsyringe';
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  Post,
-  Put,
-  Query,
-} from '../../decorators';
+import { Body, Controller, Delete, Get, Param, Post, Put, Query } from '../../decorators';
 import { SwaggerModule } from '../../decorators/swagger-module.decorator';
 import { PageOptionsDto } from '../../shared/pagination/page-options.dto';
 import { PageDto } from '../../shared/pagination/page.dto';

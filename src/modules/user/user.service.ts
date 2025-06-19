@@ -48,19 +48,14 @@ export class UserService {
       });
     }
 
-    createUserDto.password = await this.bcryptService.encrypt(
-      createUserDto.password,
-    );
+    createUserDto.password = await this.bcryptService.encrypt(createUserDto.password);
 
     const userEntity = UserMapper.toEntity(createUserDto);
     const createdUser = await this.repository.create(userEntity);
     return UserMapper.toResponse(createdUser);
   }
 
-  async update(
-    id: string,
-    updateUserDto: UpdateUserDto,
-  ): Promise<IUserResponse | null> {
+  async update(id: string, updateUserDto: UpdateUserDto): Promise<IUserResponse | null> {
     const existingUser = await this.repository.find(id);
     if (!existingUser) {
       return null;
@@ -78,10 +73,7 @@ export class UserService {
       }
     }
 
-    const updatedUserEntity = UserMapper.updateEntityFromDto(
-      existingUser,
-      updateUserDto,
-    );
+    const updatedUserEntity = UserMapper.updateEntityFromDto(existingUser, updateUserDto);
     const savedUser = await this.repository.update(updatedUserEntity);
     return UserMapper.toResponse(savedUser);
   }
@@ -114,10 +106,7 @@ export class UserService {
     limit: number;
     totalPages: number;
   }> {
-    const [users, total] = await this.repository.findWithPagination(
-      page,
-      limit,
-    );
+    const [users, total] = await this.repository.findWithPagination(page, limit);
 
     return {
       users: UserMapper.toResponseArray(users),

@@ -29,10 +29,7 @@ export abstract class UserMapper {
     return users.map((user) => this.toResponse(user));
   }
 
-  static updateEntityFromDto(
-    user: UserEntity,
-    updateUserDto: UpdateUserDto,
-  ): UserEntity {
+  static updateEntityFromDto(user: UserEntity, updateUserDto: UpdateUserDto): UserEntity {
     if (updateUserDto.name !== undefined) {
       user.name = updateUserDto.name;
     }

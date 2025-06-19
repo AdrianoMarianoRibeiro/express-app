@@ -43,14 +43,7 @@ export interface ApiQueryOptions {
 
 export interface ApiPropertyOptions {
   description?: string;
-  type?:
-    | 'string'
-    | 'number'
-    | 'boolean'
-    | 'array'
-    | 'object'
-    | (() => any)
-    | any;
+  type?: 'string' | 'number' | 'boolean' | 'array' | 'object' | (() => any) | any;
   format?: string;
   example?: any;
   required?: boolean;
@@ -66,76 +59,38 @@ export interface ApiPropertyOptions {
 }
 
 export function ApiOperation(options: ApiOperationOptions) {
-  return function (
-    target: any,
-    propertyKey: string,
-    descriptor: PropertyDescriptor,
-  ) {
+  return function (target: any, propertyKey: string, descriptor: PropertyDescriptor) {
     Reflect.defineMetadata(SWAGGER_API_OPERATION, options, target, propertyKey);
   };
 }
 
 export function ApiResponse(options: ApiResponseOptions) {
-  return function (
-    target: any,
-    propertyKey: string,
-    descriptor: PropertyDescriptor,
-  ) {
-    const existingResponses =
-      Reflect.getMetadata(SWAGGER_API_RESPONSE, target, propertyKey) || [];
+  return function (target: any, propertyKey: string, descriptor: PropertyDescriptor) {
+    const existingResponses = Reflect.getMetadata(SWAGGER_API_RESPONSE, target, propertyKey) || [];
     existingResponses.push(options);
-    Reflect.defineMetadata(
-      SWAGGER_API_RESPONSE,
-      existingResponses,
-      target,
-      propertyKey,
-    );
+    Reflect.defineMetadata(SWAGGER_API_RESPONSE, existingResponses, target, propertyKey);
   };
 }
 
 export function ApiParam(options: ApiParamOptions) {
-  return function (
-    target: any,
-    propertyKey: string,
-    descriptor: PropertyDescriptor,
-  ) {
-    const existingParams =
-      Reflect.getMetadata(SWAGGER_API_PARAM, target, propertyKey) || [];
+  return function (target: any, propertyKey: string, descriptor: PropertyDescriptor) {
+    const existingParams = Reflect.getMetadata(SWAGGER_API_PARAM, target, propertyKey) || [];
     existingParams.push(options);
-    Reflect.defineMetadata(
-      SWAGGER_API_PARAM,
-      existingParams,
-      target,
-      propertyKey,
-    );
+    Reflect.defineMetadata(SWAGGER_API_PARAM, existingParams, target, propertyKey);
   };
 }
 
 export function ApiBody(options: ApiBodyOptions) {
-  return function (
-    target: any,
-    propertyKey: string,
-    descriptor: PropertyDescriptor,
-  ) {
+  return function (target: any, propertyKey: string, descriptor: PropertyDescriptor) {
     Reflect.defineMetadata(SWAGGER_API_BODY, options, target, propertyKey);
   };
 }
 
 export function ApiQuery(options: ApiQueryOptions) {
-  return function (
-    target: any,
-    propertyKey: string,
-    descriptor: PropertyDescriptor,
-  ) {
-    const existingQueries =
-      Reflect.getMetadata(SWAGGER_API_QUERY, target, propertyKey) || [];
+  return function (target: any, propertyKey: string, descriptor: PropertyDescriptor) {
+    const existingQueries = Reflect.getMetadata(SWAGGER_API_QUERY, target, propertyKey) || [];
     existingQueries.push(options);
-    Reflect.defineMetadata(
-      SWAGGER_API_QUERY,
-      existingQueries,
-      target,
-      propertyKey,
-    );
+    Reflect.defineMetadata(SWAGGER_API_QUERY, existingQueries, target, propertyKey);
   };
 }
 
@@ -147,13 +102,8 @@ export function ApiTags(...tags: string[]) {
 
 export function ApiProperty(options: ApiPropertyOptions = {}) {
   return function (target: any, propertyKey: string) {
-    const existingProperties =
-      Reflect.getMetadata(SWAGGER_API_PROPERTY, target.constructor) || {};
+    const existingProperties = Reflect.getMetadata(SWAGGER_API_PROPERTY, target.constructor) || {};
     existingProperties[propertyKey] = options;
-    Reflect.defineMetadata(
-      SWAGGER_API_PROPERTY,
-      existingProperties,
-      target.constructor,
-    );
+    Reflect.defineMetadata(SWAGGER_API_PROPERTY, existingProperties, target.constructor);
   };
 }
