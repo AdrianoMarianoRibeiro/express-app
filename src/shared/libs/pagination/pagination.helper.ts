@@ -12,13 +12,13 @@ export class Pagination {
     const hasNext = currentPage <= totalPages - 1;
 
     return {
-      totalPages: totalPages,
+      totalPages,
       itemsLength: dtos.length,
-      hasNext: hasNext,
+      hasNext,
       items: dtos,
-      currentPage: currentPage,
+      currentPage,
       skippedRecords: skip,
-      totalRecords: totalRecords,
+      totalRecords,
     };
   }
 }

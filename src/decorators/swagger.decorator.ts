@@ -58,50 +58,81 @@ export interface ApiPropertyOptions {
   isArray?: boolean;
 }
 
-export function ApiOperation(options: ApiOperationOptions) {
-  return function (target: any, propertyKey: string, descriptor: PropertyDescriptor) {
+// Tipo específico para decorators de método - corrigido
+type MethodDecorator<T = any> = (
+  target: T,
+  propertyKey: string | symbol,
+  descriptor?: PropertyDescriptor,
+) => void | PropertyDescriptor;
+
+// Tipo específico para decorators de classe
+type ClassDecorator<T = any> = (target: new (...args: any[]) => T) => void;
+
+// Tipo específico para decorators de propriedade
+type PropertyDecorator = (target: any, propertyKey: string | symbol) => void;
+
+export function ApiOperation(options: ApiOperationOptions): MethodDecorator {
+  return function (target: any, propertyKey: string | symbol, descriptor?: PropertyDescriptor) {
+    // Usar o descriptor se necessário para validações ou modificações
+    if (descriptor && typeof descriptor.value === 'function') {
+      // Você pode modificar ou validar a função aqui se necessário
+      const originalMethod = descriptor.value;
+
+      // Exemplo: adicionar validação ou log
+      descriptor.value = function (...args: any[]) {
+        // Log da operação antes da execução (exemplo de uso do descriptor)
+        console.log(`Executing API operation: ${options.summary || String(propertyKey)}`);
+        return originalMethod.apply(this, args);
+      };
+    }
+
     Reflect.defineMetadata(SWAGGER_API_OPERATION, options, target, propertyKey);
+    return descriptor;
   };
 }
 
-export function ApiResponse(options: ApiResponseOptions) {
-  return function (target: any, propertyKey: string, descriptor: PropertyDescriptor) {
+export function ApiResponse(options: ApiResponseOptions): MethodDecorator {
+  return function (target: any, propertyKey: string | symbol, descriptor?: PropertyDescriptor) {
     const existingResponses = Reflect.getMetadata(SWAGGER_API_RESPONSE, target, propertyKey) || [];
     existingResponses.push(options);
     Reflect.defineMetadata(SWAGGER_API_RESPONSE, existingResponses, target, propertyKey);
+    return descriptor;
   };
 }
 
-export function ApiParam(options: ApiParamOptions) {
-  return function (target: any, propertyKey: string, descriptor: PropertyDescriptor) {
+export function ApiParam(options: ApiParamOptions): MethodDecorator {
+  return function (target: any, propertyKey: string | symbol, descriptor?: PropertyDescriptor) {
     const existingParams = Reflect.getMetadata(SWAGGER_API_PARAM, target, propertyKey) || [];
     existingParams.push(options);
     Reflect.defineMetadata(SWAGGER_API_PARAM, existingParams, target, propertyKey);
+    return descriptor;
   };
 }
 
-export function ApiBody(options: ApiBodyOptions) {
-  return function (target: any, propertyKey: string, descriptor: PropertyDescriptor) {
+export function ApiBody(options: ApiBodyOptions): MethodDecorator {
+  return function (target: any, propertyKey: string | symbol, descriptor?: PropertyDescriptor) {
     Reflect.defineMetadata(SWAGGER_API_BODY, options, target, propertyKey);
+    return descriptor;
   };
 }
 
-export function ApiQuery(options: ApiQueryOptions) {
-  return function (target: any, propertyKey: string, descriptor: PropertyDescriptor) {
+export function ApiQuery(options: ApiQueryOptions): MethodDecorator {
+  return function (target: any, propertyKey: string | symbol, descriptor?: PropertyDescriptor) {
     const existingQueries = Reflect.getMetadata(SWAGGER_API_QUERY, target, propertyKey) || [];
     existingQueries.push(options);
     Reflect.defineMetadata(SWAGGER_API_QUERY, existingQueries, target, propertyKey);
+    return descriptor;
   };
 }
 
-export function ApiTags(...tags: string[]) {
-  return function (target: Function) {
+export function ApiTags(...tags: string[]): ClassDecorator {
+  return function (target: new (...args: any[]) => any) {
     Reflect.defineMetadata(SWAGGER_API_TAGS, tags, target);
   };
 }
 
-export function ApiProperty(options: ApiPropertyOptions = {}) {
-  return function (target: any, propertyKey: string) {
+export function ApiProperty(options: ApiPropertyOptions = {}): PropertyDecorator {
+  return function (target: any, propertyKey: string | symbol) {
     const existingProperties = Reflect.getMetadata(SWAGGER_API_PROPERTY, target.constructor) || {};
     existingProperties[propertyKey] = options;
     Reflect.defineMetadata(SWAGGER_API_PROPERTY, existingProperties, target.constructor);

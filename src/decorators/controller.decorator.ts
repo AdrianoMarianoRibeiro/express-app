@@ -1,6 +1,6 @@
-import { Request, Response } from 'express';
+import { Request } from 'express';
 import 'reflect-metadata';
-import { ParamMetadata, PARAMS_KEY } from './param.decorator';
+import { PARAMS_KEY, ParamMetadata } from './param.decorator';
 
 export const CONTROLLER_KEY = Symbol('controller');
 export const ROUTES_KEY = Symbol('routes');
@@ -11,19 +11,17 @@ export interface RouteDefinition {
   methodName: string | symbol;
 }
 
+// Define tipos mais específicos para o decorator
+type ControllerConstructor = new (...args: any[]) => any;
+
 export function Controller(prefix: string = '') {
-  return function (target: Function) {
+  return function (target: ControllerConstructor) {
     Reflect.defineMetadata(CONTROLLER_KEY, prefix, target);
   };
 }
 
 // Helper function to extract parameters
-export function extractParameters(
-  target: any,
-  methodName: string | symbol,
-  req: Request,
-  res: Response,
-): any[] {
+export function extractParameters(target: any, methodName: string | symbol, req: Request): any[] {
   const paramsMetadata: ParamMetadata[] = Reflect.getMetadata(PARAMS_KEY, target, methodName) || [];
   const methodParams = Reflect.getMetadata('design:paramtypes', target, methodName) || [];
 
@@ -49,9 +47,12 @@ export function extractParameters(
   return args;
 }
 
+// Define tipos mais específicos para os route decorators
+type MethodDecorator = (target: any, propertyKey: string, descriptor?: PropertyDescriptor) => void;
+
 function createRouteDecorator(method: 'get' | 'post' | 'put' | 'delete' | 'patch') {
-  return function (path: string = '') {
-    return function (target: any, propertyKey: string, descriptor: PropertyDescriptor) {
+  return function (path: string = ''): MethodDecorator {
+    return function (target: any, propertyKey: string) {
       const existingRoutes: RouteDefinition[] =
         Reflect.getMetadata(ROUTES_KEY, target.constructor) || [];
 

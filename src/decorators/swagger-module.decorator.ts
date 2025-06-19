@@ -42,8 +42,11 @@ export interface SwaggerModuleConfig {
   };
 }
 
+// Tipo mais específico para o constructor
+type ClassConstructor = new (...args: any[]) => object;
+
 export function SwaggerModule(config: SwaggerModuleConfig) {
-  return function <T extends { new (...args: any[]): {} }>(constructor: T) {
+  return function <T extends ClassConstructor>(constructor: T): T {
     // Aplicar tag ao controller
     ApiTags(config.tag)(constructor);
 

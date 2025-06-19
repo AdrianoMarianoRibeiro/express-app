@@ -1,4 +1,3 @@
-import { Request, Response } from 'express';
 import { injectable } from 'tsyringe';
 import { Controller, Get } from '../decorators/controller.decorator';
 
@@ -6,7 +5,7 @@ import { Controller, Get } from '../decorators/controller.decorator';
 @injectable()
 export class AppController {
   @Get()
-  getHello(req: Request, res: Response) {
+  getHello() {
     return {
       message: 'Hello World!',
       version: '1.0.0',
@@ -15,7 +14,7 @@ export class AppController {
   }
 
   @Get('/health')
-  healthCheck(req: Request, res: Response) {
+  healthCheck() {
     return {
       status: 'OK',
       timestamp: new Date().toISOString(),

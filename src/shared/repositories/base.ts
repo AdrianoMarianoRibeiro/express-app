@@ -1,8 +1,8 @@
 import { Repository, SelectQueryBuilder } from 'typeorm';
-import { PageMetaDto } from '../pagination/page-meta.dto';
-import { PageDto } from '../pagination/page.dto';
-import { PageOptionsDto } from '../pagination/page-options.dto';
 import { OrderEnum } from '../pagination/order.enum';
+import { PageMetaDto } from '../pagination/page-meta.dto';
+import { PageOptionsDto } from '../pagination/page-options.dto';
+import { PageDto } from '../pagination/page.dto';
 
 // Interface para opções de busca e ordenação
 export interface GetAllOptions<T> {
@@ -13,7 +13,6 @@ export interface GetAllOptions<T> {
   searchTerm?: string;
   searchFields?: Array<keyof T>;
   excludeFields?: Array<keyof T>;
-  relationSelects?: Record<string, string[]>;
   excludeRelationFields?: Record<string, string[]>;
 }
 
@@ -43,27 +42,27 @@ export abstract class AppBaseRepository<T extends Record<string, any>> {
   find(id: number | string, relations: string[] = []): Promise<T | null> {
     return this.repository.findOne({
       where: { id } as any,
-      relations: relations,
+      relations,
     });
   }
 
   findAll(relations: string[] = []): Promise<T[]> {
     return this.repository.find({
-      relations: relations,
+      relations,
     });
   }
 
   findOneWhere(where: any, relations: string[] = []): Promise<T | null> {
     return this.repository.findOne({
       where,
-      relations: relations,
+      relations,
     });
   }
 
   findWhere(where: any, relations: string[] = []): Promise<T[]> {
     return this.repository.find({
       where,
-      relations: relations,
+      relations,
     });
   }
 
@@ -79,7 +78,6 @@ export abstract class AppBaseRepository<T extends Record<string, any>> {
       searchTerm,
       searchFields = [],
       excludeFields = [],
-      relationSelects = {},
       excludeRelationFields = {},
     } = options;
 

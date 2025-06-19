@@ -28,7 +28,6 @@ export class PostController {
       filters: {},
       relations: ['userEntity'],
       excludeFields: [],
-      relationSelects: {},
       excludeRelationFields: {
         userEntity: ['password'], // Excluir password do userEntity
       },
