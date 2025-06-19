@@ -81,8 +81,8 @@ export abstract class AppBaseRepository<T extends Record<string, any>> {
       excludeRelationFields = {},
     } = options;
 
-    pageOptionsDto.page = parseInt(pageOptionsDto.page.toString()) || 1;
-    pageOptionsDto.limit = parseInt(pageOptionsDto.limit.toString()) || 10;
+    pageOptionsDto.page = parseInt(pageOptionsDto?.page?.toString()) || 1;
+    pageOptionsDto.limit = parseInt(pageOptionsDto?.limit?.toString()) || 10;
     pageOptionsDto.order = pageOptionsDto.order || OrderEnum.ASC;
     const skip = pageOptionsDto.skip ?? (pageOptionsDto.page - 1) * pageOptionsDto.limit;
 
