@@ -90,7 +90,7 @@ export class PostResponseDto {
     type: () => UserResponseDto, // Referência ao DTO do usuário
     required: false,
   })
-  userEntity?: UserResponseDto;
+  user?: UserResponseDto;
 
   @ApiProperty({
     description: 'Creation date',

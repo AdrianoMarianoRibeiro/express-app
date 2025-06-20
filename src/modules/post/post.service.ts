@@ -17,11 +17,16 @@ export class PostService {
     private readonly userService: UserService,
   ) {}
 
-  findAll(
+  async findAll(
     pageOptionsDto: PageOptionsDto,
     options: GetAllOptions<PostEntity>,
-  ): Promise<PageDto<PostEntity>> {
-    return this.repository.getAll(pageOptionsDto, options);
+  ): Promise<PageDto<PostResponseDto>> {
+    const { items, meta } = await this.repository.getAll(pageOptionsDto, options);
+
+    return {
+      items: items.map(PostMapper.toResponse),
+      meta,
+    };
   }
 
   async find(id: string): Promise<PostResponseDto | null> {

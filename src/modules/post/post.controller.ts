@@ -20,7 +20,7 @@ export class PostController {
     @Query() pageOptionsDto: PageOptionsDto,
     @Query('orderBy') orderByField?: string,
     @Query('searchTerm') searchTerm?: string,
-  ): Promise<PageDto<PostEntity>> {
+  ): Promise<PageDto<PostResponseDto>> {
     const options: GetAllOptions<PostEntity> = {
       orderByField: orderByField as keyof PostEntity,
       searchTerm,
