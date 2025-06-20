@@ -26,7 +26,8 @@ export class UserController {
       orderByField: orderByField as keyof UserEntity,
       searchTerm,
       searchFields: ['name', 'email', 'status'],
-      filters: { status: true },
+      filters: {},
+      // filters: { status: true },
       relations: [],
       excludeFields: ['password'],
     };
