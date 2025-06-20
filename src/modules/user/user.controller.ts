@@ -54,4 +54,9 @@ export class UserController {
   delete(@Param('id') id: string) {
     return this.service.softDelete(id);
   }
+
+  @Get('get-all')
+  getAll() {
+    return this.service.getAll();
+  }
 }

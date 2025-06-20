@@ -116,4 +116,9 @@ export class UserService {
       totalPages: Math.ceil(total / limit),
     };
   }
+
+  async getAll(): Promise<IUserResponse[]> {
+    const userEntities = await this.repository.findWhere({ status: true });
+    return userEntities.map(UserMapper.toResponse);
+  }
 }
