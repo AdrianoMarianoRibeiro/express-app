@@ -4,7 +4,7 @@ export const PARAMS_KEY = Symbol('params');
 
 export interface ParamMetadata {
   index: number;
-  type: 'param' | 'query' | 'body' | 'headers';
+  type: 'param' | 'query' | 'body' | 'headers' | 'req' | 'res';
   key?: string;
 }
 
@@ -61,6 +61,34 @@ export function Headers(key?: string) {
       index: parameterIndex,
       type: 'headers',
       key,
+    });
+
+    Reflect.defineMetadata(PARAMS_KEY, existingParams, target, propertyKey);
+  };
+}
+
+export function Req() {
+  return function (target: any, propertyKey: string | symbol, parameterIndex: number) {
+    const existingParams: ParamMetadata[] =
+      Reflect.getMetadata(PARAMS_KEY, target, propertyKey) || [];
+
+    existingParams.push({
+      index: parameterIndex,
+      type: 'req',
+    });
+
+    Reflect.defineMetadata(PARAMS_KEY, existingParams, target, propertyKey);
+  };
+}
+
+export function Res() {
+  return function (target: any, propertyKey: string | symbol, parameterIndex: number) {
+    const existingParams: ParamMetadata[] =
+      Reflect.getMetadata(PARAMS_KEY, target, propertyKey) || [];
+
+    existingParams.push({
+      index: parameterIndex,
+      type: 'res',
     });
 
     Reflect.defineMetadata(PARAMS_KEY, existingParams, target, propertyKey);
