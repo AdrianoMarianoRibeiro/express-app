@@ -10,6 +10,8 @@ import { LoginResponse, RefreshTokenPayload, TokenPayload } from './interfaces';
 
 @injectable()
 export class AuthService {
+  private blacklistedTokens: Set<string> = new Set();
+
   constructor(
     @inject(UserService) private readonly userService: UserService,
     @inject(BcryptService) private readonly bcryptService: BcryptService,
@@ -55,18 +57,66 @@ export class AuthService {
     };
   }
 
-  async logout(): Promise<void> {
-    // Em uma implementação stateless, não podemos realmente "revogar" tokens
-    // Uma opção seria manter uma pequena blacklist de tokens revogados em cache (Redis)
-    // Por enquanto, vamos simplesmente retornar (os tokens expirarão por si só)
-    return;
+  async logout(request: Request): Promise<{ message: string }> {
+    try {
+      // Extrair token do header Authorization no formato Express
+      const authHeader = request.headers.authorization;
+      const token = authHeader && authHeader.split(' ')[1];
+
+      if (!token) {
+        throw new AppException('No token provided', HttpStatusCode.Unauthorized);
+      }
+
+      // Verificar se o token é válido antes de adicionar à blacklist
+      const decoded = this.validateToken(token);
+
+      // Adicionar o JTI (token ID) à blacklist (se existir)
+      if (decoded.jti) {
+        this.blacklistedTokens.add(decoded.jti);
+      }
+
+      // Opcional: também invalidar o refresh token se fornecido
+      const refreshToken = request.headers['x-refresh-token'] as string;
+      if (refreshToken) {
+        try {
+          const refreshSecret =
+            process.env.JWT_REFRESH_SECRET || 'refresh-secret-key-change-in-production';
+          const decodedRefresh = verify(refreshToken, refreshSecret) as RefreshTokenPayload;
+          if (decodedRefresh.jti) {
+            this.blacklistedTokens.add(decodedRefresh.jti);
+          }
+        } catch (error: any) {
+          console.error('Error processing refresh token:', error.message);
+        }
+      }
+
+      return { message: 'Logout successful' };
+    } catch (error) {
+      if (error instanceof AppException) {
+        throw error;
+      }
+      throw new AppException('Logout failed', HttpStatusCode.BadRequest);
+    }
   }
 
   async refreshToken(request: Request): Promise<any> {
     try {
-      // Correção: usar o método .get() em vez de notação de colchetes
-      const authHeader = request.headers.get('authorization');
-      const token = authHeader && authHeader.split(' ')[1];
+      // Obter token do header ou do body
+      let token: string | undefined;
+
+      // Tentar obter do header Authorization
+      const authHeader = request.headers.authorization;
+      if (authHeader) {
+        const parts = authHeader.split(' ');
+        if (parts.length === 2 && parts[0] === 'Bearer') {
+          token = parts[1];
+        }
+      }
+
+      // Se não encontrou no header, tentar no body
+      if (!token && request.body && request.body.refreshToken) {
+        token = request.body.refreshToken;
+      }
 
       if (!token) {
         throw new AppException('No refresh token provided', HttpStatusCode.Unauthorized);
@@ -107,6 +157,18 @@ export class AuthService {
     } catch (error: any) {
       throw new AppException('Invalid token', HttpStatusCode.Unauthorized, error.message);
     }
+  }
+
+  // Método para limpar tokens expirados da blacklist (opcional)
+  cleanupBlacklist(): void {
+    // Esta implementação simples limpa todos os tokens
+    // Em produção, você deveria verificar os timestamps de expiração
+    this.blacklistedTokens.clear();
+  }
+
+  // Método para verificar se um token está na blacklist
+  isTokenBlacklisted(jti: string): boolean {
+    return this.blacklistedTokens.has(jti);
   }
 
   private generateTokens(

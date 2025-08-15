@@ -1,4 +1,4 @@
-import { Request } from 'express';
+import { Request, Response } from 'express';
 import 'reflect-metadata';
 import { PARAMS_KEY, ParamMetadata } from './param.decorator';
 
@@ -20,8 +20,13 @@ export function Controller(prefix: string = '') {
   };
 }
 
-// Helper function to extract parameters
-export function extractParameters(target: any, methodName: string | symbol, req: Request): any[] {
+// Helper function to extract parameters - atualizada para suportar req e res
+export function extractParameters(
+  target: any,
+  methodName: string | symbol,
+  req: Request,
+  res: Response,
+): any[] {
   const paramsMetadata: ParamMetadata[] = Reflect.getMetadata(PARAMS_KEY, target, methodName) || [];
   const methodParams = Reflect.getMetadata('design:paramtypes', target, methodName) || [];
 
@@ -40,6 +45,12 @@ export function extractParameters(target: any, methodName: string | symbol, req:
         break;
       case 'headers':
         args[param.index] = param.key ? req.headers[param.key] : req.headers;
+        break;
+      case 'req':
+        args[param.index] = req;
+        break;
+      case 'res':
+        args[param.index] = res;
         break;
     }
   });

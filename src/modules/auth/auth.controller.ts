@@ -19,9 +19,7 @@ export class AuthController {
   }
 
   @Post('logout')
-  async logout() {
-    // Com tokens stateless, o logout é principalmente no lado do cliente
-    // O cliente deve descartar seus tokens
-    return { message: 'Logged out successfully' };
+  async logout(@Req() request: Request) {
+    return this.authService.logout(request);
   }
 }

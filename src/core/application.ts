@@ -14,8 +14,8 @@ import {
 import { MODULE_KEY, ModuleOptions } from '../decorators/module.decorator';
 import { SwaggerGenerator } from '../shared/common/swagger/swagger.generator';
 import { AppException } from '../shared/exceptions';
-import { HttpResponseInterceptor } from './http/response.interceptor';
 import { AppExceptionFilter } from '../shared/filters/http-exception/app-http-exception.filter';
+import { HttpResponseInterceptor } from './http/response.interceptor';
 
 export class ExpressApplication {
   private app: Express;
