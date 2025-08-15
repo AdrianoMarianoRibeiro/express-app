@@ -1,5 +1,5 @@
 import { inject, injectable } from 'tsyringe';
-import { Body, Controller, Post, Req } from '../../decorators';
+import { Body, Controller, Post, Req, SkipAuth } from '../../decorators';
 import { AuthService } from './auth.service';
 import { AuthDto } from './dtos';
 
@@ -9,6 +9,7 @@ export class AuthController {
   constructor(@inject(AuthService) private readonly authService: AuthService) {}
 
   @Post('login')
+  @SkipAuth()
   async login(@Body() authDto: AuthDto) {
     return this.authService.login(authDto);
   }

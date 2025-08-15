@@ -33,7 +33,7 @@ export class PostController {
       },
     };
 
-    return this.service.findAll(pageOptionsDto, options);
+    return await this.service.findAll(pageOptionsDto, options);
   }
 
   @Post()

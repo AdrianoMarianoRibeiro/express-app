@@ -5,6 +5,7 @@ import morgan from 'morgan';
 import swaggerUi from 'swagger-ui-express';
 import { container } from 'tsyringe';
 import { DataSource } from 'typeorm';
+import { SKIP_AUTH_KEY } from '../decorators';
 import {
   CONTROLLER_KEY,
   ROUTES_KEY,
@@ -12,6 +13,7 @@ import {
   extractParameters,
 } from '../decorators/controller.decorator';
 import { MODULE_KEY, ModuleOptions } from '../decorators/module.decorator';
+import { authGuard } from '../modules/middleware/auth.guard';
 import { SwaggerGenerator } from '../shared/common/swagger/swagger.generator';
 import { AppException } from '../shared/exceptions';
 import { AppExceptionFilter } from '../shared/filters/http-exception/app-http-exception.filter';
@@ -203,29 +205,11 @@ export class ExpressApplication {
     const normalizedPrefix = this.normalizePath(controllerPrefix || '');
 
     // Ordenar rotas: rotas mais específicas primeiro
-    const sortedRoutes = routes.sort((a, b) => {
-      const aParams = (a.path.match(/:/g) || []).length;
-      const bParams = (b.path.match(/:/g) || []).length;
+    // const sortedRoutes = routes.sort((a, b) => {
+    //   // ...existing sorting logic...
+    // });
 
-      const aSpecificSegments = a.path
-        .split('/')
-        .filter((segment) => segment && !segment.startsWith(':')).length;
-      const bSpecificSegments = b.path
-        .split('/')
-        .filter((segment) => segment && !segment.startsWith(':')).length;
-
-      if (aSpecificSegments !== bSpecificSegments) {
-        return bSpecificSegments - aSpecificSegments;
-      }
-
-      if (aParams !== bParams) {
-        return aParams - bParams;
-      }
-
-      return b.path.length - a.path.length;
-    });
-
-    sortedRoutes.forEach((route) => {
+    routes.forEach((route) => {
       // Padronizar o path da rota
       const normalizedRoutePath = this.normalizePath(route.path);
 
@@ -234,22 +218,40 @@ export class ExpressApplication {
 
       console.log(`Registering: ${route.requestMethod.toUpperCase()} ${fullPath}`);
 
-      this.app[route.requestMethod](fullPath, async (req: Request, res: Response, next) => {
-        console.log(`Route hit: ${req.method} ${req.path}`);
-        try {
-          const args = extractParameters(controllerInstance, route.methodName, req, res);
+      // Verificar se esta rota deve pular a autenticação
+      const skipAuth = Reflect.getMetadata(SKIP_AUTH_KEY, controllerInstance, route.methodName);
 
-          const result = await controllerInstance[route.methodName](...args);
-          if (result !== undefined && !res.headersSent) {
-            res.json(result);
+      // Middleware array - sempre começa vazio
+      const middlewares = [];
+
+      // Se não tiver skipAuth, adiciona o authGuard
+      if (!skipAuth) {
+        middlewares.push(authGuard());
+      }
+
+      // Registrar a rota com os middlewares apropriados
+      this.app[route.requestMethod](
+        fullPath,
+        ...middlewares,
+        async (req: Request, res: Response, next) => {
+          console.log(`Route hit: ${req.method} ${req.path}`);
+          try {
+            const args = extractParameters(controllerInstance, route.methodName, req, res);
+
+            const result = await controllerInstance[route.methodName](...args);
+            if (result !== undefined && !res.headersSent) {
+              res.json(result);
+            }
+          } catch (error) {
+            console.error('Error in route handler:', error);
+            next(error);
           }
-        } catch (error) {
-          console.error('Error in route handler:', error);
-          next(error);
-        }
-      });
+        },
+      );
 
-      console.log(`✅ Registered route: ${route.requestMethod.toUpperCase()} ${fullPath}`);
+      console.log(
+        `✅ Registered route: ${route.requestMethod.toUpperCase()} ${fullPath} ${skipAuth ? '(Public)' : '(Protected)'}`,
+      );
     });
   }
 

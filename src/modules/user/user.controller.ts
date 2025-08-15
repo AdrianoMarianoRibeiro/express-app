@@ -32,7 +32,7 @@ export class UserController {
       excludeFields: ['password'],
     };
 
-    return this.service.findAll(pageOptionsDto, options);
+    return await this.service.findAll(pageOptionsDto, options);
   }
 
   @Post()

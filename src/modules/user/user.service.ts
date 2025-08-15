@@ -118,7 +118,7 @@ export class UserService {
   }
 
   async getAll(): Promise<IUserResponse[]> {
-    const userEntities = await this.repository.findWhere({ status: true });
+    const userEntities = await this.repository.findAll();
     return userEntities.map(UserMapper.toResponse);
   }
 }
