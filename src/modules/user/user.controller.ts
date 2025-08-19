@@ -16,6 +16,11 @@ import { UserService } from './user.service';
 export class UserController {
   constructor(private readonly service: UserService) {}
 
+  @Get('get-all')
+  getAll() {
+    return this.service.getAll();
+  }
+
   @Get()
   async findAll(
     @Query() pageOptionsDto: PageOptionsDto,
@@ -53,10 +58,5 @@ export class UserController {
   @Delete(':id')
   delete(@Param('id') id: string) {
     return this.service.softDelete(id);
-  }
-
-  @Get('get-all')
-  getAll() {
-    return this.service.getAll();
   }
 }

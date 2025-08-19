@@ -4,6 +4,8 @@ import { PageOptionsDto } from '../../shared/pagination/page-options.dto';
 import { PageDto } from '../../shared/pagination/page.dto';
 import { GetAllOptions } from '../../shared/repositories';
 import { BcryptService } from '../bcrypt/bcrypt.service';
+import { RabbitMQQueueEnum } from '../rabbitmq/enums/rabbitmq-queue.enum';
+import { RabbitMQPublishService } from '../rabbitmq/services/rabbitMQ-publish.service';
 import { CreateUserDto, UpdateUserDto } from './dtos';
 import { IUserResponse } from './interfaces';
 import { UserMapper } from './mappers';
@@ -15,6 +17,7 @@ export class UserService {
   constructor(
     @inject(UserRepository) private repository: UserRepository,
     private readonly bcryptService: BcryptService,
+    @inject(RabbitMQPublishService) private rabbitMQPublishUseCase: RabbitMQPublishService,
   ) {}
 
   findAll(
@@ -119,6 +122,16 @@ export class UserService {
 
   async getAll(): Promise<IUserResponse[]> {
     const userEntities = await this.repository.findAll();
+    // Publish user created event to RabbitMQ
+    await this.rabbitMQPublishUseCase.publish(RabbitMQQueueEnum.REQUEST_COMPLETED, {
+      parent: '112233',
+    });
+    await this.rabbitMQPublishUseCase.publish(RabbitMQQueueEnum.REQUEST_COMPLETED, {
+      parent: '334455',
+    });
+    await this.rabbitMQPublishUseCase.publish(RabbitMQQueueEnum.REQUEST_COMPLETED, {
+      parent: '667788',
+    });
     return userEntities.map(UserMapper.toResponse);
   }
 }
