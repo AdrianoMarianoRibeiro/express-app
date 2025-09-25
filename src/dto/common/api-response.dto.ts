@@ -1,6 +1,6 @@
 import { Response } from "express";
 
-export abstract class ApiResponseDto<T> {
+export class ApiResponseDto<T> {
   data?: T;
   message: string;
   success: boolean;
@@ -62,7 +62,7 @@ export abstract class ApiResponseDto<T> {
   }
 }
 
-export abstract class PaginatedResponseDto<T> extends ApiResponseDto<T[]> {
+export class PaginatedResponseDto<T> extends ApiResponseDto<T[]> {
   total: number;
   page: number;
   limit: number;
