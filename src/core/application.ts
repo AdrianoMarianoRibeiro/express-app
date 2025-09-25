@@ -90,7 +90,7 @@ export class ExpressApplication {
         fullPath,
         async (req: Request, res: Response) => {
           try {
-            const result = await controllerInstance[route.methodName](req, res);
+            const result = await (controllerInstance as any)[route.methodName](req, res);
             if (result !== undefined && !res.headersSent) {
               res.json(result);
             }

@@ -1,0 +1,54 @@
+# Working optimized Dockerfile demonstrating all optimizations
+FROM node:18-slim AS base
+
+# Install basic build tools for native dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    python3 \
+    make \
+    g++ \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+# Stage: Production dependencies only
+FROM base AS prod-dependencies
+
+WORKDIR /app
+
+# Copy package files for better layer caching
+COPY package.json package-lock.json .npmrc ./
+
+# Install only production dependencies and skip problematic packages
+ENV CI=true \
+    HUSKY=0 \
+    NODE_ENV=production
+
+RUN npm ci --omit=dev --no-audit --prefer-offline \
+    && npm cache clean --force
+
+# Stage: Final production image
+FROM base AS production
+
+# Create non-root user for security
+RUN groupadd -r nodejs && useradd -r -g nodejs nodejs
+
+WORKDIR /app
+
+# Copy production dependencies from previous stage
+COPY --from=prod-dependencies --chown=nodejs:nodejs /app/node_modules ./node_modules
+
+# Copy pre-built application (dist folder already exists locally)
+COPY --chown=nodejs:nodejs dist ./dist
+COPY --chown=nodejs:nodejs package.json ./
+
+# Switch to non-root user
+USER nodejs
+
+# Expose port
+EXPOSE 3000
+
+# Add health check for container health monitoring
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+  CMD node -e "require('http').get('http://localhost:3000/health', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) })"
+
+# Start the application
+CMD ["npm", "run", "start:prod"]
